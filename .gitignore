@@ -1,0 +1,24 @@
+# uv / virtual environments
+.venv/
+.uv/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Packaging / builds
+build/
+dist/
+*.egg-info/
+
+# Test / coverage artifacts
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+
+# Editor / OS noise
+.DS_Store
+.vscode/
+.idea/
