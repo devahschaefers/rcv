@@ -1,6 +1,7 @@
 """Init command - Initialize a resumes directory."""
 
 from pathlib import Path
+import shutil
 from typing import Optional
 
 import typer
@@ -28,6 +29,24 @@ def init(
 
     # Create the directory if it doesn't exist
     path.mkdir(parents=True, exist_ok=True)
+
+    assets_dir = path / "assets"
+    assets_latex_dir = assets_dir / "latex"
+    assets_typst_dir = assets_dir / "typst"
+    assets_latex_dir.mkdir(parents=True, exist_ok=True)
+    assets_typst_dir.mkdir(parents=True, exist_ok=True)
+
+    package_assets_dir = Path(__file__).resolve().parents[1] / "assets"
+    assets_to_copy = {
+        package_assets_dir / "latex" / "preamble.tex": assets_latex_dir
+        / "preamble.tex",
+        package_assets_dir / "typst" / "resume_config.typ": assets_typst_dir
+        / "resume_config.typ",
+    }
+
+    for source_path, dest_path in assets_to_copy.items():
+        if source_path.exists() and not dest_path.exists():
+            shutil.copy2(source_path, dest_path)
 
     # Update config
     config = Config.load()

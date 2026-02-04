@@ -30,6 +30,12 @@ rcv init ~/resumes
 
 This creates the directory if needed and saves the path to the config file.
 
+`rcv init` also creates an `assets/` folder inside your resumes directory:
+- `assets/latex/preamble.tex` — shared LaTeX preamble (macros, header styles, spacing)
+- `assets/typst/resume_config.typ` — shared Typst config/macros
+
+These files are optional helpers; `rcv new` still creates blank resume files. Reference them with relative paths (e.g., `\input{../assets/latex/preamble.tex}` or `#import "../assets/typst/resume_config.typ": *`).
+
 ## Changing the LaTeX Compiler
 
 If you need XeTeX (for custom fonts) or LuaTeX:

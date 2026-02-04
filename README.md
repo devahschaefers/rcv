@@ -45,7 +45,7 @@ rcv tree
 | Command | Description |
 |---------|-------------|
 | `rcv init [path]` | Initialize a directory as your resumes directory |
-| `rcv new <name>` | Create a new base resume |
+| `rcv new <name>` | Create a new base resume (optionally from existing) |
 | `rcv branch <source> <name>` | Create a variant of an existing resume |
 | `rcv list` | List all resumes in a table |
 | `rcv tree` | Display resume hierarchy as a tree |
@@ -55,6 +55,23 @@ rcv tree
 | `rcv watch <name>` | Auto-rebuild on file changes |
 | `rcv archive <name>` | Archive a resume (hide from listings) |
 | `rcv diff <a> <b>` | Show differences between two resumes |
+
+### Shared Assets
+
+When you run `rcv init`, the tool also creates an `assets/` directory inside your resumes directory:
+
+- `assets/latex/preamble.tex` — LaTeX preamble (macros, header styles, spacing). Include it in your LaTeX resumes with `\input{../assets/latex/preamble.tex}` (adjust the relative path as needed).
+- `assets/typst/resume_config.typ` — Typst config/macros for similar spacing and helpers. Import with `#import "../assets/typst/resume_config.typ": *`.
+
+These files are optional; `rcv new` still creates a blank resume. Edit the assets to fit your style.
+
+You can also seed a new resume from an existing `.tex`/`.typ` file using `--from`:
+
+```bash
+rcv new data-eng --from /path/to/main.tex
+```
+
+When using `--from` with a file path, the source file is moved into the new resume folder and renamed to `resume.tex` / `resume.typ` (not copied).
 
 See [docs/commands.md](docs/commands.md) for detailed documentation.
 
@@ -111,6 +128,9 @@ rcv new swe
 rcv branch swe google
 rcv branch swe amazon
 rcv branch swe startup
+
+# Create a new base resume from an existing variant
+rcv new principal --from swe/google
 
 # Tag resumes as you apply
 rcv tag swe/google applied

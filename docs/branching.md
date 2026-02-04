@@ -44,6 +44,13 @@ rcv branch swe/google google-l5
 # Creates: swe/variants/google/variants/google-l5/
 ```
 
+### New Base From Existing
+
+```bash
+rcv new principal --from swe/google
+# Creates: principal/ (root resume seeded from swe/google)
+```
+
 ## Naming Conventions
 
 Use the path-style naming to reference resumes:

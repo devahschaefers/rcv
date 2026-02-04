@@ -24,6 +24,7 @@ rcv init    # Uses current directory
 - Creates the directory if it doesn't exist
 - Saves the path to `~/.config/rcv/config.yaml`
 - You only need to run this once
+- Also creates `assets/latex/preamble.tex` and `assets/typst/resume_config.typ` under the resumes directory for shared macros/config (optional to use)
 
 ---
 
@@ -32,7 +33,7 @@ rcv init    # Uses current directory
 Create a new base resume.
 
 ```bash
-rcv new <NAME> [--format FORMAT]
+rcv new <NAME> [--format FORMAT] [--from SOURCE]
 ```
 
 **Arguments:**
@@ -40,16 +41,22 @@ rcv new <NAME> [--format FORMAT]
 
 **Options:**
 - `-f, --format`: Resume format (`latex` or `typst`). Defaults to config setting.
+- `-s, --from`: Create a new base resume from an existing resume name **or** a path to a `.tex`/`.typ` file.
 
 **Examples:**
 ```bash
 rcv new swe
 rcv new designer --format typst
+rcv new principal --from swe/google
 ```
 
 **Notes:**
 - Creates a new folder with a template resume file
 - Template includes basic structure (contact, experience, education, skills)
+- When using `--from`, it copies the source resume content and format
+- `--from` accepts either a managed resume name (e.g., `swe/google`) or a direct `.tex`/`.typ` file path
+- `--format` must match the source format when used with `--from`
+- When `--from` is given a file path, the source file is moved into the new resume folder and renamed to `resume.tex` / `resume.typ`
 
 ---
 
