@@ -12,8 +12,8 @@ uv sync
 # Run directly
 uv run rcv --help
 
-# Or install globally with pipx
-pipx install .
+# Or install globally as a uv tool
+uv tool install .
 rcv --help
 ```
 
