@@ -74,8 +74,8 @@ class Config:
     default_format: str = "latex"  # latex or typst
     latex_compiler: str = "pdflatex"  # pdflatex, xelatex, lualatex
     typst_compiler: str = "typst"
-    output_dir: str = "PDFs"
-    output_pdf_name: str = "resume"
+    output_dir: Optional[str] = None
+    output_pdf_name: Optional[str] = None
 
     @classmethod
     def _find_project_dir(cls, start_dir: Optional[Path] = None) -> Optional[Path]:
@@ -104,8 +104,14 @@ class Config:
             default_format=str(data.get("default_format", "latex")),
             latex_compiler=str(data.get("latex_compiler", "pdflatex")),
             typst_compiler=str(data.get("typst_compiler", "typst")),
-            output_dir=str(data.get("output_dir", "PDFs")),
-            output_pdf_name=str(data.get("output_pdf_name", "resume")),
+            output_dir=(
+                str(data["output_dir"]) if data.get("output_dir") is not None else None
+            ),
+            output_pdf_name=(
+                str(data["output_pdf_name"])
+                if data.get("output_pdf_name") is not None
+                else None
+            ),
         )
 
     @classmethod
@@ -122,8 +128,14 @@ class Config:
             default_format=str(data.get("default_format", "latex")),
             latex_compiler=str(data.get("latex_compiler", "pdflatex")),
             typst_compiler=str(data.get("typst_compiler", "typst")),
-            output_dir=str(data.get("output_dir", "PDFs")),
-            output_pdf_name=str(data.get("output_pdf_name", "resume")),
+            output_dir=(
+                str(data["output_dir"]) if data.get("output_dir") is not None else None
+            ),
+            output_pdf_name=(
+                str(data["output_pdf_name"])
+                if data.get("output_pdf_name") is not None
+                else None
+            ),
         )
 
     def save(self) -> None:
@@ -137,9 +149,11 @@ class Config:
             f"default_format = {_toml_quote(self.default_format)}\n"
             f"latex_compiler = {_toml_quote(self.latex_compiler)}\n"
             f"typst_compiler = {_toml_quote(self.typst_compiler)}\n"
-            f"output_dir = {_toml_quote(self.output_dir)}\n"
-            f"output_pdf_name = {_toml_quote(self.output_pdf_name)}\n"
         )
+        if self.output_dir is not None:
+            toml_content += f"output_dir = {_toml_quote(self.output_dir)}\n"
+        if self.output_pdf_name is not None:
+            toml_content += f"output_pdf_name = {_toml_quote(self.output_pdf_name)}\n"
         config_file.write_text(toml_content)
 
     def get_resumes_dir(self) -> Path:
@@ -153,6 +167,8 @@ class Config:
 
     def get_output_root_dir(self) -> Path:
         """Get absolute output root directory for generated PDFs."""
+        if self.output_dir is None:
+            raise ValueError("output_dir is not configured.")
         output_root = Path(self.output_dir).expanduser()
         if not output_root.is_absolute():
             output_root = self.get_resumes_dir() / output_root
@@ -160,6 +176,8 @@ class Config:
 
     def get_output_pdf_filename(self) -> str:
         """Get normalized output PDF filename."""
+        if self.output_pdf_name is None:
+            raise ValueError("output_pdf_name is not configured.")
         name = self.output_pdf_name.strip() or "resume"
         if name.lower().endswith(".pdf"):
             return name

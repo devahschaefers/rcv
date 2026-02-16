@@ -5,12 +5,17 @@ from rich.console import Console
 
 from rcv.core.config import Config
 from rcv.core.resume import find_resume
+from rcv.utils.completion import complete_resume_name
 
 console = Console()
 
 
 def tag(
-    name: str = typer.Argument(..., help="Name of the resume"),
+    name: str = typer.Argument(
+        ...,
+        help="Name of the resume",
+        shell_complete=complete_resume_name,
+    ),
     tag: str = typer.Argument(..., help="Tag to add"),
 ) -> None:
     """Add a tag to a resume.
@@ -40,7 +45,11 @@ def tag(
 
 
 def untag(
-    name: str = typer.Argument(..., help="Name of the resume"),
+    name: str = typer.Argument(
+        ...,
+        help="Name of the resume",
+        shell_complete=complete_resume_name,
+    ),
     tag: str = typer.Argument(..., help="Tag to remove"),
 ) -> None:
     """Remove a tag from a resume.

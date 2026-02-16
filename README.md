@@ -17,6 +17,42 @@ pipx install .
 rcv --help
 ```
 
+## Shell Completion
+
+Enable shell completion once:
+
+```bash
+rcv --install-completion
+```
+
+Then tab completion supports:
+- command names and flags
+- resume names and variant paths (hierarchical, e.g. `SWE`, then `SWE/<variant>`)
+- `--format` values (`latex`, `typst`)
+- `--from` seed file paths (`.tex`, `.typ`)
+- expandable resume nodes complete with trailing `/` for drill-down
+
+For zsh menu cycling on repeated Tab:
+
+```bash
+zstyle ':completion:*' menu select
+```
+
+For fish, write the completion file explicitly:
+
+```fish
+mkdir -p ~/.config/fish/completions
+env _RCV_COMPLETE=source_fish rcv > ~/.config/fish/completions/rcv.fish
+exec fish
+```
+
+Or use the built-in helper:
+
+```fish
+rcv setup-fish-completion
+exec fish
+```
+
 ## Quick Start
 
 ```bash
@@ -40,6 +76,10 @@ rcv branch swe/ml startup
 rcv tree
 ```
 
+`rcv init` will ask for:
+- Default PDF output directory (for example `PDFs`)
+- Default output PDF filename (for example `resume`)
+
 ## Commands
 
 | Command | Description |
@@ -55,6 +95,7 @@ rcv tree
 | `rcv watch <name>` | Auto-rebuild on file changes |
 | `rcv archive <name>` | Archive a resume (hide from listings) |
 | `rcv diff <a> <b>` | Show differences between two resumes |
+| `rcv setup-fish-completion` | Install fish shell completion |
 
 ### Shared Assets
 
@@ -113,6 +154,9 @@ typst_compiler = "typst"
 output_dir = "PDFs"
 output_pdf_name = "resume"
 ```
+
+If either `output_dir` or `output_pdf_name` is missing, `rcv build` / `rcv watch`
+will prompt for it once and write it back to `.rcv.toml`.
 
 Default PDF output layout (when `--output` is not provided):
 

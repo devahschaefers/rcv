@@ -2,6 +2,42 @@
 
 Detailed documentation for all RCV commands.
 
+## Shell Completion
+
+Install completion for your shell:
+
+```bash
+rcv --install-completion
+```
+
+Completion includes:
+- Command and flag completion
+- Resume/variant name completion (hierarchical path segments)
+- `--format` values (`latex`, `typst`)
+- `--from` file paths for `.tex` / `.typ`
+- Expandable resume nodes complete with trailing `/` for drill-down to child variants
+
+For fish, write the completion file explicitly:
+
+```fish
+mkdir -p ~/.config/fish/completions
+env _RCV_COMPLETE=source_fish rcv > ~/.config/fish/completions/rcv.fish
+exec fish
+```
+
+Or use the built-in helper:
+
+```fish
+rcv setup-fish-completion
+exec fish
+```
+
+For zsh menu cycling on repeated Tab:
+
+```bash
+zstyle ':completion:*' menu select
+```
+
 ## init
 
 Initialize a directory as your resumes directory.
@@ -24,7 +60,32 @@ rcv init    # Uses current directory
 - Creates the directory if it doesn't exist
 - Creates project-local config at `.rcv.toml`
 - Run commands from this project directory (or any child directory)
+- Prompts for default `output_dir` and `output_pdf_name`
 - Also creates `assets/latex/preamble.tex` and `assets/typst/resume_config.typ` under the resumes directory for shared macros/config (optional to use)
+
+---
+
+## setup-fish-completion
+
+Install fish shell completion for `rcv`.
+
+```bash
+rcv setup-fish-completion [--output PATH] [--force]
+```
+
+**Options:**
+- `-o, --output`: Path to write fish completion file (default: `~/.config/fish/completions/rcv.fish`)
+- `-f, --force`: Overwrite existing completion file
+
+**Examples:**
+```bash
+rcv setup-fish-completion
+rcv setup-fish-completion --force
+```
+
+**Notes:**
+- Writes fish completion script to disk
+- Open a new fish shell (or run `exec fish`) to load changes
 
 ---
 
@@ -173,6 +234,7 @@ rcv build swe/google -o ~/Documents/
 - LaTeX builds support resume paths with spaces and iCloud-style `~` segments
 - LaTeX intermediate files (`.aux`, `.log`, `.out`) are cleaned up after each build
 - Default output mirrors resume hierarchy under configured `output_dir`
+- If `output_dir` / `output_pdf_name` is missing, prompts once and saves to `.rcv.toml`
 
 ---
 
@@ -243,6 +305,7 @@ rcv watch swe/google -o ~/Documents/
 - For LaTeX resumes, watch mode supports paths with spaces and iCloud-style `~` segments
 - LaTeX intermediate files (`.aux`, `.log`, `.out`) are cleaned up after each rebuild
 - Default output mirrors resume hierarchy under configured `output_dir`
+- If `output_dir` / `output_pdf_name` is missing, prompts once and saves to `.rcv.toml`
 
 ---
 

@@ -10,7 +10,13 @@ from watchdog.events import FileSystemEventHandler
 
 from rcv.core.config import Config
 from rcv.core.resume import find_resume
-from rcv.commands.build import build_latex, build_typst, resolve_output_file
+from rcv.commands.build import (
+    build_latex,
+    build_typst,
+    ensure_output_settings,
+    resolve_output_file,
+)
+from rcv.utils.completion import complete_resume_name
 
 console = Console()
 
@@ -54,7 +60,11 @@ class ResumeWatcher(FileSystemEventHandler):
 
 
 def watch(
-    name: str = typer.Argument(..., help="Name of the resume to watch"),
+    name: str = typer.Argument(
+        ...,
+        help="Name of the resume to watch",
+        shell_complete=complete_resume_name,
+    ),
     output: Path = typer.Option(
         None,
         "--output",
@@ -87,6 +97,7 @@ def watch(
         console.print(f"[red]Resume file not found:[/red] {resume_file}")
         raise typer.Exit(1)
 
+    ensure_output_settings(config)
     output_file = resolve_output_file(resume.full_name, resume_file, config, output)
     output_file.parent.mkdir(parents=True, exist_ok=True)
 

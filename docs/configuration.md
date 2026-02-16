@@ -36,6 +36,7 @@ This creates:
 - `.rcv.toml` in the project root
 - `assets/latex/preamble.tex`
 - `assets/typst/resume_config.typ`
+- Prompts for `output_dir` and `output_pdf_name`
 
 ## Default Output Layout
 
@@ -54,6 +55,9 @@ Output:      PDFs/swe/resume.pdf
 Resume name: swe/google/meta
 Output:      PDFs/swe/google/meta/resume.pdf
 ```
+
+If `output_dir` or `output_pdf_name` is missing in `.rcv.toml`, `rcv build` and
+`rcv watch` will prompt for values and persist them automatically.
 
 ## Changing the LaTeX Compiler
 
@@ -91,4 +95,3 @@ Each resume has a `.meta.json` file with its own metadata:
   "archived": false
 }
 ```
-

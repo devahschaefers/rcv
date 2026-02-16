@@ -8,13 +8,22 @@ from rich.syntax import Syntax
 
 from rcv.core.config import Config
 from rcv.core.resume import find_resume
+from rcv.utils.completion import complete_resume_name
 
 console = Console()
 
 
 def diff(
-    a: str = typer.Argument(..., help="First resume name"),
-    b: str = typer.Argument(..., help="Second resume name"),
+    a: str = typer.Argument(
+        ...,
+        help="First resume name",
+        shell_complete=complete_resume_name,
+    ),
+    b: str = typer.Argument(
+        ...,
+        help="Second resume name",
+        shell_complete=complete_resume_name,
+    ),
     context: int = typer.Option(
         3,
         "--context",

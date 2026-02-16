@@ -15,10 +15,10 @@ console = Console()
 def init(
     path: Optional[Path] = typer.Argument(
         None,
-        help="Path to initialize as resumes directory. Defaults to current directory.",
+        help="Path to initialize as an RCV project. Defaults to current directory.",
     ),
 ) -> None:
-    """Initialize a directory as your resumes directory.
+    """Initialize a directory as an RCV project.
 
     This creates a project-local .rcv.toml configuration file.
     """
@@ -48,9 +48,17 @@ def init(
         if source_path.exists() and not dest_path.exists():
             shutil.copy2(source_path, dest_path)
 
+    output_dir = typer.prompt("Default PDF output directory", default="PDFs").strip()
+    output_pdf_name = typer.prompt(
+        "Default output PDF filename (without extension)",
+        default="resume",
+    ).strip()
+
     # Update project-local config
     config = Config.load_from_project_dir(path)
     config.project_dir = path
+    config.output_dir = output_dir or "PDFs"
+    config.output_pdf_name = output_pdf_name or "resume"
     config.save()
 
     console.print(f"[green]Initialized resumes directory at:[/green] {path}")

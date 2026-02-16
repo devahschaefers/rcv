@@ -14,13 +14,14 @@ from rcv.commands import (
     watch,
     archive,
     diff,
+    completion,
 )
 
 app = typer.Typer(
     name="rcv",
     help="Resume Control Versioning - Manage versioned resumes with branching support",
     no_args_is_help=True,
-    add_completion=False,  # Hide --install-completion / --show-completion
+    add_completion=True,
 )
 
 console = Console()
@@ -37,6 +38,7 @@ app.command(name="untag")(tag.untag)
 app.command(name="watch")(watch.watch)
 app.command(name="archive")(archive.archive)
 app.command(name="diff")(diff.diff)
+app.command(name="setup-fish-completion")(completion.setup_fish_completion)
 
 
 @app.callback()

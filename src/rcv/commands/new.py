@@ -8,7 +8,8 @@ import typer
 from rich.console import Console
 
 from rcv.core.config import Config
-from rcv.core.resume import Resume, find_resume
+from rcv.core.resume import Resume
+from rcv.utils.completion import complete_resume_format, complete_seed_file
 
 console = Console()
 
@@ -20,12 +21,14 @@ def new(
         "--format",
         "-f",
         help="Resume format: latex or typst. Defaults to config setting.",
+        shell_complete=complete_resume_format,
     ),
     source: Optional[str] = typer.Option(
         None,
         "--from",
         "-s",
         help="Create a new base resume from a .tex/.typ file path.",
+        shell_complete=complete_seed_file,
     ),
 ) -> None:
     """Create a new base resume.

@@ -9,18 +9,24 @@ from rich.console import Console
 
 from rcv.core.config import Config
 from rcv.core.resume import Resume, ResumeMetadata, find_resume, VARIANTS_DIR
+from rcv.utils.completion import complete_resume_name, complete_seed_file
 
 console = Console()
 
 
 def branch(
-    source: str = typer.Argument(..., help="Name of the resume to branch from"),
+    source: str = typer.Argument(
+        ...,
+        help="Name of the resume to branch from",
+        shell_complete=complete_resume_name,
+    ),
     name: str = typer.Argument(..., help="Name for the new variant"),
     seed: Optional[str] = typer.Option(
         None,
         "--from",
         "-s",
         help="Seed the new variant from a .tex/.typ file path instead of the source resume.",
+        shell_complete=complete_seed_file,
     ),
 ) -> None:
     """Create a new variant (branch) of an existing resume.

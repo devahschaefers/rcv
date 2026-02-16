@@ -218,6 +218,13 @@ def find_resume(resumes_dir: Path, name: str) -> Optional[Resume]:
     - Simple name: "swe" -> finds resumes_dir/swe
     - Path name: "swe/google" -> finds resumes_dir/swe/variants/google
     """
+    name = name.strip()
+    if not name:
+        return None
+    name = name.rstrip("/")
+    if not name:
+        return None
+
     # Handle path-style names
     parts = name.split("/")
 

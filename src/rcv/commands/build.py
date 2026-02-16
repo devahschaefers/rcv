@@ -9,8 +9,31 @@ from rich.console import Console
 
 from rcv.core.config import Config
 from rcv.core.resume import find_resume
+from rcv.utils.completion import complete_resume_name
 
 console = Console()
+
+
+def ensure_output_settings(config: Config) -> None:
+    """Prompt once for missing output settings and persist to .rcv.toml."""
+    updated = False
+
+    if not config.output_dir:
+        output_dir = typer.prompt("Default PDF output directory", default="PDFs").strip()
+        config.output_dir = output_dir or "PDFs"
+        updated = True
+
+    if not config.output_pdf_name:
+        output_name = typer.prompt(
+            "Default output PDF filename (without extension)",
+            default="resume",
+        ).strip()
+        config.output_pdf_name = output_name or "resume"
+        updated = True
+
+    if updated:
+        config.save()
+        console.print("[dim]Saved output defaults to .rcv.toml[/dim]")
 
 
 def cleanup_latex_artifacts(output_dir: Path, stem: str) -> None:
@@ -37,6 +60,7 @@ def resolve_output_file(
             output_dir = Path.cwd() / output_dir
         return output_dir / f"{resume_file.stem}.pdf"
 
+    ensure_output_settings(config)
     logical_resume_path = Path(*resume_full_name.split("/"))
     return (
         config.get_output_root_dir()
@@ -46,7 +70,11 @@ def resolve_output_file(
 
 
 def build(
-    name: str = typer.Argument(..., help="Name of the resume to build"),
+    name: str = typer.Argument(
+        ...,
+        help="Name of the resume to build",
+        shell_complete=complete_resume_name,
+    ),
     output: Path = typer.Option(
         None,
         "--output",
@@ -76,6 +104,7 @@ def build(
         console.print(f"[red]Resume file not found:[/red] {resume_file}")
         raise typer.Exit(1)
 
+    ensure_output_settings(config)
     output_file = resolve_output_file(resume.full_name, resume_file, config, output)
     output_file.parent.mkdir(parents=True, exist_ok=True)
 

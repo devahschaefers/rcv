@@ -5,12 +5,17 @@ from rich.console import Console
 
 from rcv.core.config import Config
 from rcv.core.resume import find_resume
+from rcv.utils.completion import complete_resume_name
 
 console = Console()
 
 
 def archive(
-    name: str = typer.Argument(..., help="Name of the resume"),
+    name: str = typer.Argument(
+        ...,
+        help="Name of the resume",
+        shell_complete=complete_resume_name,
+    ),
     unarchive: bool = typer.Option(
         False,
         "--unarchive",
