@@ -44,6 +44,13 @@ rcv branch swe/google google-l5
 # Creates: swe/variants/google/variants/google-l5/
 ```
 
+### Seeding a Branch From a File
+
+```bash
+rcv branch swe/google meta --from /path/to/main.tex
+# Creates: swe/variants/google/variants/meta/ with the seed copied to resume.tex
+```
+
 ### New Base From Existing
 
 ```bash

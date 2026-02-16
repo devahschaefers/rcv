@@ -7,7 +7,7 @@ from typing import Optional
 import typer
 from rich.console import Console
 
-from rcv.core.config import Config
+from rcv.core.config import CONFIG_FILE_NAME, Config
 
 console = Console()
 
@@ -20,7 +20,7 @@ def init(
 ) -> None:
     """Initialize a directory as your resumes directory.
 
-    This sets up the global configuration to point to your resumes.
+    This creates a project-local .rcv.toml configuration file.
     """
     if path is None:
         path = Path.cwd()
@@ -48,10 +48,10 @@ def init(
         if source_path.exists() and not dest_path.exists():
             shutil.copy2(source_path, dest_path)
 
-    # Update config
-    config = Config.load()
-    config.resumes_dir = path
+    # Update project-local config
+    config = Config.load_from_project_dir(path)
+    config.project_dir = path
     config.save()
 
     console.print(f"[green]Initialized resumes directory at:[/green] {path}")
-    console.print(f"[dim]Config saved to ~/.config/rcv/config.yaml[/dim]")
+    console.print(f"[dim]Config saved to {path / CONFIG_FILE_NAME}[/dim]")

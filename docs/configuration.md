@@ -1,60 +1,77 @@
 # Configuration
 
-RCV uses a YAML configuration file stored at `~/.config/rcv/config.yaml`.
+RCV uses a project-local TOML configuration file at `.rcv.toml` in your resumes project root.
+
+Commands discover this file by searching upward from your current working directory.
 
 ## Configuration Options
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `resumes_dir` | (none) | Path to your resumes directory |
 | `default_format` | `latex` | Default format for new resumes (`latex` or `typst`) |
 | `latex_compiler` | `pdflatex` | LaTeX compiler to use |
 | `typst_compiler` | `typst` | Typst compiler command |
+| `output_dir` | `PDFs` | Root folder for default PDF output paths (relative to project root if not absolute) |
+| `output_pdf_name` | `resume` | Default output PDF filename used by `build`/`watch` when `--output` is not passed |
 
-## Example Configuration
+## Example `.rcv.toml`
 
-```yaml
-resumes_dir: /home/user/resumes
-default_format: latex
-latex_compiler: pdflatex
-typst_compiler: typst
+```toml
+default_format = "latex"
+latex_compiler = "pdflatex"
+typst_compiler = "typst"
+output_dir = "PDFs"
+output_pdf_name = "resume"
 ```
 
-## Setting the Resumes Directory
+## Setting Up a Project
 
-The easiest way to set up your resumes directory is with `rcv init`:
+Initialize a project with:
 
 ```bash
 rcv init ~/resumes
 ```
 
-This creates the directory if needed and saves the path to the config file.
+This creates:
+- `.rcv.toml` in the project root
+- `assets/latex/preamble.tex`
+- `assets/typst/resume_config.typ`
 
-`rcv init` also creates an `assets/` folder inside your resumes directory:
-- `assets/latex/preamble.tex` — shared LaTeX preamble (macros, header styles, spacing)
-- `assets/typst/resume_config.typ` — shared Typst config/macros
+## Default Output Layout
 
-These files are optional helpers; `rcv new` still creates blank resume files. Reference them with relative paths (e.g., `\input{../assets/latex/preamble.tex}` or `#import "../assets/typst/resume_config.typ": *`).
+When `--output` is not provided, `rcv build` and `rcv watch` write PDFs to:
+
+```text
+<output_dir>/<resume-logical-path>/<output_pdf_name>.pdf
+```
+
+Examples:
+
+```text
+Resume name: swe
+Output:      PDFs/swe/resume.pdf
+
+Resume name: swe/google/meta
+Output:      PDFs/swe/google/meta/resume.pdf
+```
 
 ## Changing the LaTeX Compiler
 
-If you need XeTeX (for custom fonts) or LuaTeX:
+If you need XeTeX or LuaTeX, edit `.rcv.toml`:
 
-```yaml
-latex_compiler: xelatex
+```toml
+latex_compiler = "xelatex"
 # or
-latex_compiler: lualatex
+latex_compiler = "lualatex"
 ```
 
 ## Using Typst by Default
 
-To create all new resumes in Typst format:
-
-```yaml
-default_format: typst
+```toml
+default_format = "typst"
 ```
 
-Or specify format per-resume:
+Or specify per resume:
 
 ```bash
 rcv new modern-resume --format typst
@@ -75,9 +92,3 @@ Each resume has a `.meta.json` file with its own metadata:
 }
 ```
 
-This metadata is managed automatically by RCV commands:
-- `created_at` / `updated_at`: Set automatically
-- `tags`: Managed with `rcv tag` / `rcv untag`
-- `format`: Set when creating resume
-- `archived`: Set with `rcv archive`
-- `notes`: Currently not exposed via CLI (edit manually if needed)

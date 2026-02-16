@@ -44,7 +44,7 @@ rcv tree
 
 | Command | Description |
 |---------|-------------|
-| `rcv init [path]` | Initialize a directory as your resumes directory |
+| `rcv init [path]` | Initialize a directory as an RCV project |
 | `rcv new <name>` | Create a new base resume (optionally from existing) |
 | `rcv branch <source> <name>` | Create a variant of an existing resume |
 | `rcv list` | List all resumes in a table |
@@ -70,8 +70,14 @@ You can also seed a new resume from an existing `.tex`/`.typ` file using `--from
 ```bash
 rcv new data-eng --from /path/to/main.tex
 ```
+When using `--from` with a file path, the source file is copied into the new resume folder and renamed to `resume.tex` / `resume.typ`.
 
-When using `--from` with a file path, the source file is moved into the new resume folder and renamed to `resume.tex` / `resume.typ` (not copied).
+Branching with an external seed:
+
+```bash
+rcv branch swe/google meta --from /path/to/main.tex
+```
+This creates `swe/variants/google/variants/meta/` and copies the seed file to `resume.tex`.
 
 See [docs/commands.md](docs/commands.md) for detailed documentation.
 
@@ -97,13 +103,27 @@ See [docs/commands.md](docs/commands.md) for detailed documentation.
 
 ## Configuration
 
-Global config is stored at `~/.config/rcv/config.yaml`:
+RCV uses a project-local config file at `<project>/.rcv.toml`.
+RCV discovers this file by walking upward from your current working directory.
 
-```yaml
-resumes_dir: /home/user/resumes
-default_format: latex          # latex or typst
-latex_compiler: pdflatex       # pdflatex, xelatex, or lualatex
-typst_compiler: typst
+```toml
+default_format = "latex"       # latex or typst
+latex_compiler = "pdflatex"    # pdflatex, xelatex, or lualatex
+typst_compiler = "typst"
+output_dir = "PDFs"
+output_pdf_name = "resume"
+```
+
+Default PDF output layout (when `--output` is not provided):
+
+```text
+<project>/PDFs/<resume-name-path>/resume.pdf
+```
+
+Example:
+
+```text
+DataEngineer/google  ->  PDFs/DataEngineer/google/resume.pdf
 ```
 
 ## Supported Formats
@@ -129,8 +149,11 @@ rcv branch swe google
 rcv branch swe amazon
 rcv branch swe startup
 
-# Create a new base resume from an existing variant
-rcv new principal --from swe/google
+# Create a new base resume from an existing file
+rcv new principal --from /path/to/main.tex
+
+# Branch from an existing resume but seed content from a file
+rcv branch swe/google meta --from /path/to/main.tex
 
 # Tag resumes as you apply
 rcv tag swe/google applied
@@ -152,6 +175,9 @@ rcv watch swe/google
 # Edit resume.tex in your favorite editor
 # PDF updates automatically on save
 # Press Ctrl+C to stop
+# LaTeX watch/build supports paths with spaces and iCloud-style "~" segments
+# LaTeX intermediate files (.aux/.log/.out) are cleaned up automatically
+# Default output path mirrors resume hierarchy under PDFs/
 ```
 
 ### Comparing Variants

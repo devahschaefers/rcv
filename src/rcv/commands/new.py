@@ -25,7 +25,7 @@ def new(
         None,
         "--from",
         "-s",
-        help="Create a new base resume from an existing resume name.",
+        help="Create a new base resume from a .tex/.typ file path.",
     ),
 ) -> None:
     """Create a new base resume.
@@ -36,48 +36,37 @@ def new(
     config = Config.load()
     resumes_dir = config.get_resumes_dir()
 
-    source_resume = None
     template_content: Optional[str] = None
     template_format: Optional[str] = None
-    move_source_file: Optional[Path] = None
+    source_file_path: Optional[Path] = None
 
     if source is not None:
-        # Try to resolve as a managed resume first
-        source_resume = find_resume(resumes_dir, source)
+        # --from accepts only file paths (tex/typ)
+        source_path = Path(source)
+        candidates = []
+        if source_path.is_absolute():
+            candidates.append(source_path)
+        else:
+            candidates.append(Path.cwd() / source_path)
+            candidates.append(resumes_dir / source_path)
 
-        # If not found, try file-path sources (tex/typ) relative to cwd and resumes_dir
-        if source_resume is None:
-            candidates = []
-            source_path = Path(source)
-            if source_path.is_absolute():
-                candidates.append(source_path)
-            else:
-                candidates.append(Path.cwd() / source_path)
-                candidates.append(resumes_dir / source_path)
+        for candidate in candidates:
+            if candidate.is_file() and candidate.suffix in {".tex", ".typ"}:
+                source_file_path = candidate
+                template_format = "latex" if candidate.suffix == ".tex" else "typst"
+                break
 
-            for candidate in candidates:
-                if candidate.is_file() and candidate.suffix in {".tex", ".typ"}:
-                    template_content = None
-                    template_format = "latex" if candidate.suffix == ".tex" else "typst"
-                    move_source_file = candidate
-                    break
-
-        if source_resume is None and template_content is None:
+        if source_file_path is None:
             console.print(
                 f"[red]Source not found:[/red] {source}\n"
-                "Provide a managed resume name (e.g., 'swe/google') or a path to a .tex/.typ file."
+                "Provide a .tex/.typ file path (absolute, cwd-relative, or project-root-relative)."
             )
             raise typer.Exit(1)
-
-    if source_resume is not None:
-        if source_resume.resume_file.exists():
-            template_content = source_resume.resume_file.read_text()
-        template_format = source_resume.metadata.format
 
     if template_format is not None and format is not None:
         if format != template_format:
             console.print(
-                "[red]Format mismatch:[/red] --format must match the source resume or template."
+                "[red]Format mismatch:[/red] --format must match the source file format."
             )
             raise typer.Exit(1)
 
@@ -100,18 +89,22 @@ def new(
         console.print(f"[red]Resume already exists:[/red] {name}")
         raise typer.Exit(1)
 
+    # If sourcing from a file path, copy its content; otherwise use template_content
+    if source_file_path is not None:
+        template_content = source_file_path.read_text()
+
     # Create the resume
     resume = Resume.create(
         resume_path, format=format, template_content=template_content
     )
 
-    # If sourcing from a file path, move it into place and rename to resume.<ext>
-    if move_source_file is not None:
+    # If sourcing from a file path, ensure the file is placed as resume.<ext>
+    if source_file_path is not None:
         dest_file = resume.resume_file
         if dest_file.exists():
             dest_file.unlink()
         dest_file.parent.mkdir(parents=True, exist_ok=True)
-        shutil.move(str(move_source_file), str(dest_file))
+        shutil.copy2(source_file_path, dest_file)
 
     console.print(f"[green]Created new resume:[/green] {name}")
     if source is not None:

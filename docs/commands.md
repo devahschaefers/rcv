@@ -22,8 +22,8 @@ rcv init    # Uses current directory
 
 **Notes:**
 - Creates the directory if it doesn't exist
-- Saves the path to `~/.config/rcv/config.yaml`
-- You only need to run this once
+- Creates project-local config at `.rcv.toml`
+- Run commands from this project directory (or any child directory)
 - Also creates `assets/latex/preamble.tex` and `assets/typst/resume_config.typ` under the resumes directory for shared macros/config (optional to use)
 
 ---
@@ -33,7 +33,7 @@ rcv init    # Uses current directory
 Create a new base resume.
 
 ```bash
-rcv new <NAME> [--format FORMAT] [--from SOURCE]
+rcv new <NAME> [--format FORMAT] [--from SOURCE_FILE]
 ```
 
 **Arguments:**
@@ -41,22 +41,22 @@ rcv new <NAME> [--format FORMAT] [--from SOURCE]
 
 **Options:**
 - `-f, --format`: Resume format (`latex` or `typst`). Defaults to config setting.
-- `-s, --from`: Create a new base resume from an existing resume name **or** a path to a `.tex`/`.typ` file.
+- `-s, --from`: Create a new base resume from a `.tex`/`.typ` file path (absolute, cwd-relative, or project-root-relative).
 
 **Examples:**
 ```bash
 rcv new swe
 rcv new designer --format typst
-rcv new principal --from swe/google
+rcv new principal --from /path/to/main.tex
 ```
 
 **Notes:**
 - Creates a new folder with a template resume file
 - Template includes basic structure (contact, experience, education, skills)
-- When using `--from`, it copies the source resume content and format
-- `--from` accepts either a managed resume name (e.g., `swe/google`) or a direct `.tex`/`.typ` file path
+- When using `--from`, it copies the source file content and format
+- `--from` accepts only a `.tex`/`.typ` file path (absolute, cwd-relative, or project-root-relative)
 - `--format` must match the source format when used with `--from`
-- When `--from` is given a file path, the source file is moved into the new resume folder and renamed to `resume.tex` / `resume.typ`
+- When `--from` is given a file path, the source file is copied into the new resume folder and renamed to `resume.tex` / `resume.typ`
 
 ---
 
@@ -65,7 +65,7 @@ rcv new principal --from swe/google
 Create a variant (branch) of an existing resume.
 
 ```bash
-rcv branch <SOURCE> <NAME>
+rcv branch <SOURCE> <NAME> [--from SEED_FILE]
 ```
 
 **Arguments:**
@@ -74,12 +74,16 @@ rcv branch <SOURCE> <NAME>
 
 **Examples:**
 ```bash
-rcv branch swe google           # Creates swe/variants/google
-rcv branch swe/google meta      # Creates swe/variants/google/variants/meta
+rcv branch swe google                        # Creates swe/variants/google
+rcv branch swe/google meta                   # Creates swe/variants/google/variants/meta
+rcv branch swe/google meta --from /tmp/base.tex  # Seeds from file but places under swe/google/variants/meta
 ```
 
 **Notes:**
-- Copies the resume file from the source
+- Copies the resume file from the source by default
+- Optional `--from` seeds content from a `.tex`/`.typ` file path (absolute, cwd-relative, or project-root-relative)
+- Seed file format must match the source resume format; otherwise an error is raised
+- Seed file is copied into the new variant as `resume.tex` / `resume.typ`
 - Creates new metadata with current timestamp
 - Inherits the format (latex/typst) from source
 
@@ -153,7 +157,7 @@ rcv build <NAME> [--output DIR]
 - `NAME`: Name of the resume to build
 
 **Options:**
-- `-o, --output`: Output directory for PDF. Defaults to resume directory.
+- `-o, --output`: Output directory for PDF. If omitted, uses `.rcv.toml` defaults and writes to `<output_dir>/<resume-path>/<output_pdf_name>.pdf`.
 
 **Examples:**
 ```bash
@@ -166,6 +170,9 @@ rcv build swe/google -o ~/Documents/
 - For LaTeX: Runs compiler twice (for references)
 - Errors are displayed if compilation fails
 - Requires appropriate compiler installed (pdflatex/typst)
+- LaTeX builds support resume paths with spaces and iCloud-style `~` segments
+- LaTeX intermediate files (`.aux`, `.log`, `.out`) are cleaned up after each build
+- Default output mirrors resume hierarchy under configured `output_dir`
 
 ---
 
@@ -220,7 +227,7 @@ rcv watch <NAME> [--output DIR]
 - `NAME`: Resume name to watch
 
 **Options:**
-- `-o, --output`: Output directory for PDF
+- `-o, --output`: Output directory for PDF. If omitted, uses `.rcv.toml` defaults and writes to `<output_dir>/<resume-path>/<output_pdf_name>.pdf`.
 
 **Examples:**
 ```bash
@@ -233,6 +240,9 @@ rcv watch swe/google -o ~/Documents/
 - Rebuilds automatically when the resume file changes
 - Press `Ctrl+C` to stop watching
 - Uses 1-second debounce to avoid rapid rebuilds
+- For LaTeX resumes, watch mode supports paths with spaces and iCloud-style `~` segments
+- LaTeX intermediate files (`.aux`, `.log`, `.out`) are cleaned up after each rebuild
+- Default output mirrors resume hierarchy under configured `output_dir`
 
 ---
 
